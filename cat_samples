@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+#this script will combine all of the L001 files together, and all of the L002 files together
+
+
+IFS="_"
+
+for x in ./*_CP05062_L001_R1_001.fastq.gz;
+  #returns ./dA_CP05062_L001_R1_001.fastq.gz ./dB_CP05062_L001_R1_001.fastq.gz ...
+do
+  read -d "_" terms <<< $x; # $terms returns ./dA ./dB ...
+  prefix=$(basename $terms) #prefix returns dA dB ...
+
+  #unzip files, cat files, rezip into a new _cat_R?_001.fastq.gz file
+  zcat "$prefix"_CP05062_L001_R1_001.fastq.gz "$prefix"_CP05062_L002_R1_001.fastq.gz | gzip > "$prefix"_CP05062_cat_R1_001.fastq.gz
+  zcat "$prefix"_CP05062_L001_R2_001.fastq.gz "$prefix"_CP05062_L002_R2_001.fastq.gz | gzip > "$prefix"_CP05062_cat_R2_001.fastq.gz
+
+done
