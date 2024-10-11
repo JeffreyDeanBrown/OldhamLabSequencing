@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#this script will combine all of the L001 files together, and all of the L002 files together
+#this script will concatenate all of the L001 and L002 files together into a new file
 
 
 IFS="_"
