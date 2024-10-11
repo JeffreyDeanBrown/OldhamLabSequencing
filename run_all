@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#
+#
+#  Usage:    run_all [DIRECTORY]
+#
+#
+#  Notes:   [DIRECTORY] must contained all of the samples to be analyized (see Description below)
+#           [DIRECTORY] must be the name of the directory, without the "/"
+#                       (i.e. "$ run_all all_samples" works, "$ run_all all_samples/" does not)
+#
+#  Description:
+#     This script will take all of the pairs of samples in a file, separate them into folders,
+#     and then run the assembly pipeline on the samples.
+#  
+#     So:
+#  
+#     $ tree all_samples
+#
+#     all_samples
+#     |1A_CP05062_cat_R001.fastq.gz
+#     |1A_CP05062_cat_R002.fastq.gz
+#     |2_CP05062_cat_R001.fastq.gz
+#     |2_CP05062_cat_R002.fastq.gz
+#     (etc.)
+#  
+#     Turns into:
+#     $ tree all_samples
+#
+#     all_samples
+#     |--1A_CP05062
+#       |--raw_data
+#          |1A_CP05062_cat_R001.fastq.gz
+#          |1A_CP05062_cat_R001.fastq.gz
+#       |--reports
+#       |--assembly
+#       |--trimmed_data
+#     |--2_CP05062
+#       |--raw_data
+#       (etc)
+#
+#
+#     Then each folder and pair of reads is analyzed based on our protocol
+
+
+
+if [[ $CONDA_DEFAULT_ENV = "" ]] then
+  echo "You do not have conda activated! This is required for prokka. exiting..."
+  exit 1
+fi
+
+
+
+# list each individual sample
+for x in $1/*R1*;
+
+do
+  FILE=$(basename $x);      #name of the .fastq.gz file (e.g. 1A_CP05062_cat_R001.fastq.gz)
+  SAMPLE=${FILE%_cat*}      #(e.g. 1A_CP05062)
+  PREFIX=${SAMPLE%_*}       #(e.g. 1A)
+
+  echo "making directory for $PREFIX...";
+  DIR=$1/$SAMPLE
+  mkdir -p $DIR/raw_data $DIR/trimmed_data $DIR/assembly $DIR/reports;
+  mv $1/$PREFIX*.gz $DIR/raw_data;
+
+  echo "running fastqc for $PREFIX...";
+  fastqc -o $DIR/reports/ $DIR/raw_data/*R1* $DIR/raw_data/*R2*;
+
+  echo "running trimmomatic for $PREFIX...";
+  trimmomatic PE $DIR/raw_data/*R1* $DIR/raw_data/*R2* \
+    $DIR/trimmed_data/"$PREFIX"_forward_paired.fq.gz $DIR/trimmed_data/"$PREFIX"_forward_unpaired.fq.gz \
+    $DIR/trimmed_data/"$PREFIX"_reverse_paired.fq.gz $DIR/trimmed_data/"$PREFIX"_reverse_unpaired.fq.gz \
+    ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36;
+
+  echo "running spades for $PREFIX...";
+  spades -1 $DIR/trimmed_data/*forward_paired* -2 $DIR/trimmed_data/*reverse_paired* -o $DIR/assembly/;
+
+  echo "running QUAST for $PREFIX...";
+  quast.py -o $DIR/reports/quast_results/ $DIR/assembly/contigs.fasta;
+
+  echo "assembling for $PREFIX using Prokka...";
+  prokka --outdir $DIR/annotation/ --prefix "$PREFIX"_genome $DIR/assembly/contigs.fasta;
+
+  echo "done with $PREFIX...";
+
+  done
+
+echo "\nis... is it done? did it work?\n";
