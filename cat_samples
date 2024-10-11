@@ -2,9 +2,6 @@
 
 #this script will concatenate all of the L001 and L002 files together into a new file
 
-
-IFS="_"
-
 for x in ./*_CP05062_L001_R1_001.fastq.gz;
   #returns ./dA_CP05062_L001_R1_001.fastq.gz ./dB_CP05062_L001_R1_001.fastq.gz ...
 do
