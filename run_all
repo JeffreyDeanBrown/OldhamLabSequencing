@@ -86,4 +86,4 @@ do
 
   done
 
-echo "\nis... is it done? did it work?\n";
+echo "is... is it done? did it work?";
