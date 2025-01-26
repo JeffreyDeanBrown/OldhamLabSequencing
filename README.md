@@ -9,3 +9,8 @@ the scripts and make sure you understand what it's doing.
 **cat_samples**: This is a simple script used to concatenate the L001 and L002 samples of each isolate type
 
 The scripts should be somewhat annotated, so read through the comments within the scripts for help.
+
+## Note:
+
+Most of the notes on this project and an overview of software used is currently on the project's Microsoft OneDrive Folder. I sort out a way to organize & integrate
+these two things (the OneDrive and this Github) at a future date
