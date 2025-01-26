@@ -12,5 +12,5 @@ The scripts should be somewhat annotated, so read through the comments within th
 
 ## Note:
 
-Most of the notes on this project and an overview of software used is currently in the project's Microsoft OneDrive Folder. I sort out a way to organize & integrate
-these two things (the OneDrive and this Github) at a future date
+Most of the notes on this project (and an overview of software used) is currently in the project's Microsoft OneDrive Folder. I will sort out a way to organize & integrate
+these two things (the OneDrive and this Github) at a future date.
